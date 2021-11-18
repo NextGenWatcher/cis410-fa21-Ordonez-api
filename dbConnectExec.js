@@ -10,5 +10,14 @@ async function executeQuery(aQuery) {
   let connection = await sql.connect(config);
   letResults = await connection.query(aQuery);
 
-  console.log(aQuery);
+  console.log(result);
+  return result.recordset;
 }
+
+// executeQuery(`SELECT TOP (1000) [Wallet ID PK]
+// ,[Blockchain Name]
+// ,[Wallet Type]
+// ,[Token]
+// FROM [dbo].[Contact]`);
+
+module.exports = { executeQuery: executeQuery };
