@@ -1,23 +1,22 @@
 const sql = require("mssql");
+const rockwellConfig = require("./config.js");
 const config = {
-  user: "csu",
-  password: "Uuxwp7Mcxo7Khy",
-  server: "cobazsqlcis410.database.windows.net", // You can use 'localhost\\instance' to connect to named instance
-  database: "yessy",
+  user: rockwellConfig.DB.user,
+  password: rockwellConfig.DB.password,
+  server: rockwellConfig.DB.server,
+  database: rockwellConfig.DB.database,
 };
 
 async function executeQuery(aQuery) {
   let connection = await sql.connect(config);
-  letResults = await connection.query(aQuery);
+  let result = await connection.query(aQuery);
 
-  console.log(result);
+  //console.log(result);
   return result.recordset;
 }
 
-// executeQuery(`SELECT TOP (1000) [Wallet ID PK]
-// ,[Blockchain Name]
-// ,[Wallet Type]
-// ,[Token]
-// FROM [dbo].[Contact]`);
+// executeQuery(
+//   `SELECT * FROM Movie LEFT JOIN Genre ON genre.GenrePK = movie.GenreFK`
+// );
 
 module.exports = { executeQuery: executeQuery };
