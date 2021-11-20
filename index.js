@@ -1,9 +1,11 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 
 const db = require("./dbConnectExec.js");
 
 const app = express();
 
+app.use(express.json());
 // 1 is the port we will be using
 // 2 is the funciton that we want to run once the app is running on that port
 
@@ -21,17 +23,63 @@ app.get("/hi", (req, res) => {
 app.get("/", (req, res) => {
   res.send("API is running");
 });
+//
+//
+//
+//Post Commands
+app.post("/wallets", async (req, res) => {
+  // res.send("/wallets called");
+  //console.log("request body", req.body);
 
-//app.post()
-//app.put()
+  let nameFirst = req.body.nameFirst;
+  let nameLast = req.body.nameLast;
+  let address = req.body.address;
+  let password = req.body.password;
 
-app.get("/movies", (req, res) => {
+  if (!nameFirst || !nameLast || !address || !password) {
+    return res.status(400).send("Bad request");
+  }
+  //replace argument has two part 1, what we want to replace, 2. what we want to replace it with
+  nameFirst = nameFirst.replace("'", "''");
+  nameLast = nameLast.replace("'", "''");
+
+  let emailCheckQuery = `SELECT Address
+  FROM Wallet
+  WHERE Address = '${address}'`;
+
+  let existingUser = await db.executeQuery(emailCheckQuery);
+
+  //console.log("existing user", existingUser);
+
+  if (existingUser[0]) {
+    return res.status(409).send("Address is already linked to an account");
+  }
+
+  let hashedPassword = bcrypt.hashSync(password);
+  let insertQuery = `INSERT INTO Wallet(NameFirst,NameLast, Address, Password)
+  VALUES('${nameFirst}', '${nameLast}', '${address}', '${hashedPassword}')`;
+
+  db.executeQuery(insertQuery)
+    .then(() => {
+      res.status(201).send();
+    })
+    .catch((err) => {
+      console.log("error in POST /Wallet", err);
+      res.status(500).send();
+    });
+});
+//
+//
+//
+//
+//get commands
+app.get("/nfts", (req, res) => {
   //get data from the database
   db.executeQuery(
     `SELECT *
-  FROM Movie
-  LEFT JOIN Genre
-  ON genre.GenrePK = movie.genreFK`
+    FROM NFT
+    LEFT JOIN Genre
+    ON genre.GenrePK = NFT.GenreFK`
   )
     .then((theResults) => {
       res.status(200).send(theResults);
@@ -42,14 +90,14 @@ app.get("/movies", (req, res) => {
     });
 });
 
-app.get("/movies/:pk", (req, res) => {
+app.get("/nfts/:pk", (req, res) => {
   let pk = req.params.pk;
   //console.log(pk);
   let myQuery = `SELECT *
-  FROM Movie
+  FROM NFT
   LEFT JOIN Genre
-  ON genre.GenrePK = movie.GenreFK
-  WHERE MoviePK = ${pk}`;
+  ON genre.GenrePK = NFT.GenreFK
+  WHERE NFTPK = ${pk}`;
   db.executeQuery(myQuery)
     .then((result) => {
       // console.log("result", result);

@@ -1,5 +1,5 @@
 {
-  "name": "rockwell-api",
+  "name": "ordonezproject-api",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "mssql": "^7.2.1"
   },
